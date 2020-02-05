@@ -58,7 +58,7 @@ def normalize_data(x):
     
 
 
-def linear_regression(x, t, basis, reg_lambda=0, degree=0, mu=0, s=1):
+def linear_regression(x, t, basis, reg_lambda=0, degree=0, mu=0, s=1, bias=1):
     """Perform linear regression on a training set with specified regularizer lambda and basis
 
     Args:
@@ -76,11 +76,14 @@ def linear_regression(x, t, basis, reg_lambda=0, degree=0, mu=0, s=1):
 
     # Construct the design matrix.
     # Pass the required parameters to this function
-    phi = design_matrix(x, degree, basis)
+    phi = design_matrix(x, degree=degree, mu=mu, s=s, basis=basis, bias=bias)
     # Learning Coefficients
     if reg_lambda > 0:
         # regularized regression
-        w = None
+        i = reg_lambda*np.identity(phi.shape[1])
+        regular = i+np.dot(phi.T, phi)
+        w = np.dot(regular.I, phi.T)
+        w = np.dot(w, t)
     else:
         # no regularization
         w = np.linalg.pinv(phi)
@@ -96,7 +99,7 @@ def linear_regression(x, t, basis, reg_lambda=0, degree=0, mu=0, s=1):
 
 
 
-def design_matrix(x, degree, basis=None):
+def design_matrix(x, degree=0, mu=list(), s=1, basis=None, bias=1):
     """ Compute a design matrix Phi from given input datapoints and basis.
 
     Args:
@@ -105,21 +108,28 @@ def design_matrix(x, degree, basis=None):
     Returns:
       phi design matrix
     """
-    x_change = x
-    phi = np.ones((x.shape[0], 1))
+    if bias == 1:
+        phi = np.ones((x.shape[0], 1))
+    else:
+        phi = np.empty((x.shape[0], 0))
     if basis == 'polynomial':
+        x_change = x
         for i in range(degree):
             phi = np.hstack((phi, x_change))
             x_change = np.multiply(x, x_change)
     elif basis == 'sigmoid':
-        phi = None
+        for i in range(len(mu)):
+            mu_array = mu[i]*np.ones((x.shape[0], x.shape[1]))
+            x_change = np.ones((x.shape[0], x.shape[1])) + np.exp((mu_array-x)/s)
+            x_change = 1/x_change
+            phi = np.hstack((phi, x_change))
     else:
         assert(False), 'Unknown basis %s' % basis
 
     return phi
 
 
-def evaluate_regression(x, t, w, basis, degree):
+def evaluate_regression(x, t, w, basis, degree=0, mu=list(), s=1, bias=1):
     """Evaluate linear regression on a dataset.
 
     Args:
@@ -129,7 +139,7 @@ def evaluate_regression(x, t, w, basis, degree):
       t_est values of regression on inputs
       err RMS error on training set if t is not None
       """
-    phi = design_matrix(x, degree, basis)
+    phi = design_matrix(x, degree=degree, mu=mu, s=s, basis=basis, bias=bias)
     t_est = np.dot(phi, w)
     difference = t_est - t
     square = np.multiply(difference, difference)

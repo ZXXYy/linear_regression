@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 # print(minMort1990)
 # print(minCountry1990)
 
-targets = values[:,1]
-x = values[:,7:]
+targets = values[:, 1]
+x = values[:, 7:]
 x = a1.normalize_data(x)
 
 N_TRAIN = 100
@@ -31,8 +31,10 @@ t_test = targets[N_TRAIN:]
 max_degree = 6
 train_err = dict()
 test_err = dict()
+# fit a polynomial basis function for degree 1 to degree 6
 for degree in range(1, max_degree+1):
-    (w, tr_err) = a1.linear_regression(x_train, t_train, 'polynomial', 0, degree)
+    (w, tr_err) = a1.linear_regression(x_train, t_train, 'polynomial', 0, degree=degree, bias=1)
+    # evaluate the RMS error for test data
     (t_est, te_err) = a1.evaluate_regression(x_test, t_test, w, 'polynomial', degree)
     train_err[degree] = tr_err
     test_err[degree] = te_err
@@ -46,6 +48,6 @@ plt.plot(list(train_err.keys()), list(train_err.values()))
 plt.plot(list(test_err.keys()), list(test_err.values()))
 plt.ylabel('RMS')
 plt.legend(['Training error', 'Testing error'])
-plt.title('Fit with polynomials, no regularization')
+plt.title('Fit with normalized polynomials, no regularization ')
 plt.xlabel('Polynomial degree')
 plt.show()
