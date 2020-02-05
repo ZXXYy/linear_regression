@@ -5,13 +5,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 (countries, features, values) = a1.load_unicef_data()
-
 # print(countries)
 # print(features)
+
 # ------------------get started questions--------------
-# minMortIndex1990 = np.argmin(values[:, 1])
-# minMort1990 = np.min(values[:, 1])
+# minMortIndex1990 = np.argmin(values[:, 0])
+# minMort1990 = np.min(values[:, 0])
 # minCountry1990 = countries[minMortIndex1990]
+# minMortIndex2011 = np.argmin(values[:, 1])
+# minMort2011 = np.min(values[:, 1])
+# minCountry2011 = countries[minMortIndex2011]
 # print(minMort1990)
 # print(minCountry1990)
 

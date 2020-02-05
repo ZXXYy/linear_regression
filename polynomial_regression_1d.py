@@ -5,17 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 (countries, features, values) = a1.load_unicef_data()
-
 # print(countries)
 # print(features)
-# ------------------get started questions--------------
-# minMortIndex1990 = np.argmin(values[:, 1])
-# minMort1990 = np.min(values[:, 1])
-# minCountry1990 = countries[minMortIndex1990]
-# print(minMort1990)
-# print(minCountry1990)
 
-targets = values[:,1]
+# initialize the variables
+targets = values[:, 1]
 train_err_bias = dict()
 test_err_bias = dict()
 train_err_no_bias = dict()
@@ -23,8 +17,10 @@ test_err_no_bias = dict()
 
 for specific_feature in range(7, 15):
     # print(features[7])
+    # choose a single feature
     x = values[:, specific_feature]
     # x = a1.normalize_data(x)
+
     N_TRAIN = 100
     x_train = x[0:N_TRAIN, :]
     x_test = x[N_TRAIN:, :]
@@ -33,16 +29,20 @@ for specific_feature in range(7, 15):
     # Complete the linear_regression and evaluate_regression functions of the assignment1.py
     # Pass the required parameters to these functions
     degree = 3
+    # train the data with bias term
     (w, tr_err) = a1.linear_regression(x_train, t_train, 'polynomial', reg_lambda=0, degree=degree, bias=1)
+    # evaluate the RMS error for test data
     (t_est, te_err) = a1.evaluate_regression(x_test, t_test, w, 'polynomial', degree, bias=1)
     train_err_bias[features[specific_feature]] = tr_err
     test_err_bias[features[specific_feature]] = te_err
+
+    # train the data without bias term
     (w, tr_err) = a1.linear_regression(x_train, t_train, 'polynomial', reg_lambda=0, degree=degree, bias=0)
     (t_est, te_err) = a1.evaluate_regression(x_test, t_test, w, 'polynomial', degree, bias=0)
     train_err_no_bias[features[specific_feature]] = tr_err
     test_err_no_bias[features[specific_feature]] = te_err
-    print(tr_err)
-    print(te_err)
+    # print(tr_err)
+    # print(te_err)
 
 
 # Produce a plot of results.
